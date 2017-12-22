@@ -1,0 +1,42 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.provider_class">com.zaxxer.hikari.hibernate.HikariConnectionProvider</property>
+        <property name="hibernate.connection.username">bank</property>
+        <property name="hibernate.connection.password">pass</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/bankdb</property>
+
+        <property name="connection_pool_size">2</property>
+        <property name="statement_cache.size">2</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">false</property>
+
+        <property name="use_outer_join">true</property>
+
+        <!-- Drop and re-create the database schema on startup -->
+        <!-- <property name="hbm2ddl.auto">create</property> -->
+
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
+
+
+        <!-- Add 2nd Level Cache including query caching -->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+	<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+	<property name="hibernate.cache.use_query_cache">true</property>
+	<property name="org.ehcache.configurationResourceName">/ehcache.xml</property>
+
+
+	<!-- Mapped classes -->
+        <mapping class="com.michaelwakahe.bankaccount.beans.Withdrawal" />
+        <mapping class="com.michaelwakahe.bankaccount.beans.Balance" />
+        <mapping class="com.michaelwakahe.bankaccount.beans.Deposit" />
+
+    </session-factory>
+</hibernate-configuration>

@@ -1,0 +1,39 @@
++++++++++++++++++++++++++++++++++++++++
++ Bank Database Layout.
++++++++++++++++++++++++++++++++++++++++
+
+The following describes the database tables of the bank account application.
+
+'UUID' stands for a universally unique identifier.
+For more details, see http://en.wikipedia.org/wiki/Universally_unique_identifier
+
+
+======================
+======================
+1. Account Management
+======================
+======================
+
+--------------------
+Table Balance
+--------------------
+- Id (primary key)
+- UUID
+- Amount
+
+--------------------
+Table Deposit
+--------------------
+- Id (primary key)
+- UUID
+- Amount
+- Date
+
+--------------------
+Table Withdrawal
+--------------------
+- Id (primary key)
+- UUID
+- Amount
+- Date
+

@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.michaelwakahe.bankaccount</groupId>
+    <artifactId>BankAccount</artifactId>
+    <packaging>war</packaging>
+    <version>1.0</version>
+
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+    	</dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+
+        <!-- Json manipulation -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+
+        <!-- Logging Framework -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+
+        <!-- Database dependencies -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.41</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.8.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.4.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.6.1</version>
+        </dependency>
+
+        <!-- Concerning Ehcache, as 2nd Level cache for Hibernate -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>5.2.9.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+    </dependencies>
+
+
+
+
+    <!-- Build Settings -->
+    <build>
+        <finalName>BankAccount</finalName>
+
+        <pluginManagement>
+            <plugins>
+
+                <!-- Allows for automatic deployment to Tomcat -->
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <version>2.2</version>
+                    <configuration>
+                        <url>http://localhost:8080/manager/text</url>
+                        <server>TomcatServer</server>
+                        <username>admin</username>
+                        <password>password</password>
+                    </configuration>
+                </plugin>
+
+
+                <!--
+                    order of execution is
+                    (1) prepare agent is run to configure the property, then
+                    (2) unit tests are run, then
+                    (3) the check goal of jacoco is run to check code coverage
+                -->
+
+                <!-- the surefire plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19.1</version>
+                    <configuration>
+                        <!-- (2)  setup the argLine and run the unit tests.   **NOTE the "jacocArgeLine" property was configured the "prepare-agent" goal of Jacoco  (see below) -->
+                        <!--
+                        if you want to resolve the property value as late as possible (i.e. your dyamically alter this property value before reaching this phase
+                        Maven gives you option to use @{jacocoArgLine} instead
+                        -->
+                        <argLine>${jacocoArgLine} -Xmx256m</argLine>
+
+                    </configuration>
+                </plugin>
+
+
+                <!-- the jacoco plugin, we are going to use 2 goals provided by this plugin -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.9</version>
+
+                    <executions>
+
+                    <!--
+                        (1)  Prepare agent runs in the init phase, it setups the jacocoProperty, so we can
+                        insert this to the maven surefire argLine and get to run jacoco as agent
+                    -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                        <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                        <propertyName>jacocoArgLine</propertyName>
+                        <includes>
+                            <include>com.michaelwakahe.bankaccount.*</include>
+                        </includes>
+                        </configuration>
+                    </execution>
+
+                    <!--
+                        (3) the check goal by default runs in the verify phase, we want to fail the
+                        build if mimimum code coverage checks aren't met
+                    -->
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                        <goal>check</goal>
+                        </goals>
+                        <configuration>
+                        <rules>
+                            <!--
+                                All classes must have line and branch coverage indicated below.
+                                Note we use 2 d.p so that we get can any check failure messages reported to 2 d.p
+                            -->
+                            <rule >
+                            <element>CLASS</element>
+                            <limits>
+                                <limit >
+                                <counter>LINE</counter>
+                                <value>COVEREDRATIO</value>
+                                <minimum>0.80</minimum>
+                                </limit>
+                                <limit >
+                                <counter>BRANCH</counter>
+                                <value>COVEREDRATIO</value>
+                                <minimum>0.80</minimum>
+                                </limit>
+                            </limits>
+                            <excludes>
+                                <exclude>com.choudhury.codecoverage.Bye</exclude>
+                            </excludes>
+                            </rule>
+                        </rules>
+                        </configuration>
+                    </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+    </build>
+
+
+    <reporting>
+        <plugins>
+
+            <!-- To generate javadocs. See also the 2 additions on encoding in the "properties" section. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.9</version>
+            </plugin>
+
+        </plugins>
+    </reporting>
+
+
+    <!-- More Project Information -->
+    <name>Bank Account Webapp</name>
+    <description>A Bank Account Microservice</description>
+    <url>http://www.bankaccount.com</url>
+    <inceptionYear>2017</inceptionYear>
+    <developers>
+        <developer>
+            <name>Michael Wakahe</name>
+            <id>michael</id>
+            <email>michael@michaelwakahe.com</email>
+            <organization>Michael Company</organization>
+            <roles>
+                <role>Software Engineer</role>
+            </roles>
+        </developer>
+    </developers>
+
+</project>
